@@ -20,19 +20,19 @@
     </l-map>
   </n-layout>
   <div>
-    <h2>Caminos de evacuación</h2>
+    <h2>Zonas de inundación</h2>
     <table>
       <thead>
         <tr>
           <th>Nombre</th>
-          <th>Detalle</th>
+          
         </tr>
       </thead>
       <tbody>
         <tr v-for="(zona, index) in zonas" :key="`zonas-${index}`">
           <td>{{ zona.name }}</td>
           <td>
-            <router-link to="/detalle-zona/{{zona.id}}">ver</router-link>
+            <router-link to="/detalle-zona/`zona.id`">ver</router-link>
           </td>
         </tr>
       </tbody>
@@ -93,6 +93,21 @@ export default {
       pageActualPuntos: 0,
       errors: [],
     };
+  },
+  mounted() {
+    if(!("geolocation" in navigator)) {
+      this.errorStr = 'Geolocación no esta disponible.';
+      return;
+    }
+    this.gettingLocation = true;
+    // get position
+    navigator.geolocation.getCurrentPosition(pos => {
+      this.gettingLocation = false;
+      this.center = pos;
+    }, err => {
+      this.gettingLocation = false;
+      this.errorStr = err.message;
+    })
   },
   created() {
     axios

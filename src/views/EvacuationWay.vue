@@ -93,6 +93,21 @@ export default {
       errors: [],
     };
   },
+  mounted() {
+    if(!("geolocation" in navigator)) {
+      this.errorStr = 'Geolocación no esta disponible.';
+      return;
+    }
+    this.gettingLocation = true;
+    // get position
+    navigator.geolocation.getCurrentPosition(pos => {
+      this.gettingLocation = false;
+      this.center = pos;
+    }, err => {
+      this.gettingLocation = false;
+      this.errorStr = err.message;
+    })
+  },
   created() {
     axios
       .get(
