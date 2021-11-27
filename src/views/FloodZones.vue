@@ -31,7 +31,7 @@
         <tr v-for="(zona, index) in zonas" :key="`zonas-${index}`">
           <td>{{ zona.name }}</td>
           <td>
-            <a v-bind:href="url">Ver</a>
+            <router-link to="/detalle-zona/{{zona.id}}">ver</router-link>
           </td>
         </tr>
       </tbody>

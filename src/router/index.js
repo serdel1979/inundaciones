@@ -28,7 +28,12 @@ const routes = [
   {
     path: '/recorridos-evacuacion',
     name: 'Recorridos',
-    component: () => import(/* webpackChunkName: "zonas" */ '../views/EvacuationWay.vue')
+    component: () => import(/* webpackChunkName: "caminos" */ '../views/EvacuationWay.vue')
+  },
+  {
+    path: '/detalle-zona/:id',
+    name: 'ZonaShow',
+    component: () => import(/* webpackChunkName: "verzona" */ '../views/Zonas.vue')
   },
   {
     path: '/gestion',
