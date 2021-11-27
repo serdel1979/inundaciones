@@ -3,7 +3,7 @@
     <l-map style="height: 700px; width: 95%" :zoom="zoom" :center="center">
       <l-tile-layer :url="url" :attribution="attribution"></l-tile-layer>
       <div v-for="(camino, index) in caminos" :key="`caminos-${index}`">
-        <l-polyline :lat-lngs="camino.Coordenadas" :color='red' />
+        <l-polyline :lat-lngs="camino.Coordenadas" :color="red" />
       </div>
       <div v-for="(punto, index) in puntos" :key="`puntos-${index}`">
         <l-marker :lat-lng="punto.latlong">
@@ -27,11 +27,15 @@
           <td>{{ camino.name }}</td>
           <td>{{ camino.descripcion }}</td>
           <td>
-            <a v-bind:href=(url)>Ver</a>
+            <a v-bind:href="url">Ver</a>
           </td>
         </tr>
       </tbody>
     </table>
+    <div id="pages">
+      <button v-on:click="anterior('anterior')">&#171;</button>
+      <button v-on:click="siguiente('siguiente')">&#187;</button>
+    </div>
   </div>
 </template>
 
@@ -68,6 +72,8 @@ export default {
       descripcion: "",
       gettingLocation: false,
       puntos: [],
+      pageActual: 0,
+      pageActualPuntos: 0,
       errors: [],
     };
   },
@@ -94,6 +100,75 @@ export default {
       .catch((e) => {
         this.errors.push(e);
       });
+  },
+  methods: {
+    anterior: function () {
+      if (this.pageActual > 1) {
+        this.pageActual -= 1;
+        var pag = String(this.pageActual);
+        var url =
+          "https://admin-grupo2.proyecto2021.linti.unlp.edu.ar/api/recorridos-evacuacion/?page=" +
+          pag;
+        axios
+          .get(url)
+          .then((response) => {
+            this.caminos = response.data.Recorridos;
+
+          })
+          .catch((e) => {
+            this.pageActual = 1;
+            this.errors.push(e);
+          });
+      }
+      if (this.pageActualPuntos > 1) {
+        this.pageActualPuntos -= 1;
+        var pagp = String(this.pageActualPuntos);
+        var urlp =
+          "https://admin-grupo2.proyecto2021.linti.unlp.edu.ar/api/puntos-encuentro/?page=" +
+          pagp;
+        axios
+          .get(urlp)
+          .then((response) => {
+            this.puntos = response.data.Puntos_encuentro;
+          })
+          .catch((e) => {
+            this.pageActualPuntos = 1;
+            this.errors.push(e);
+          });
+      }
+    },
+    siguiente: function () {
+      this.pageActual += 1;
+      var pag = String(this.pageActual);
+      var url =
+        "https://admin-grupo2.proyecto2021.linti.unlp.edu.ar/api/recorridos-evacuacion/?page=" +
+        pag;
+      console.log(url);
+      axios
+        .get(url)
+        .then((response) => {
+          this.caminos = response.data.Recorridos;
+        })
+        .catch((e) => {
+          this.pageActual -= 1;
+          this.errors.push(e);
+        });
+
+      this.pageActualPuntos += 1;
+      var pagp = String(this.pageActualPuntos);
+      var urlp =
+        "https://admin-grupo2.proyecto2021.linti.unlp.edu.ar/api/puntos-encuentro/?page=" +
+        pagp;
+      axios
+        .get(urlp)
+        .then((response) => {
+          this.puntos = response.data.Puntos_encuentro;
+        })
+        .catch((e) => {
+          this.pageActualPuntos -= 1;
+          this.errors.push(e);
+        });
+    },
   },
 };
 </script>

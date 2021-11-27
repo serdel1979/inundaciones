@@ -73,9 +73,9 @@ export default {
       markerLatLng: [-34.9187, -57.956],
       puntos: [],
       zonas: [],
-      total: 0,
       pageActual: 0,
-      errors: []
+      pageActualPuntos: 0,
+      errors: [],
     };
   },
   created() {
@@ -85,9 +85,7 @@ export default {
       )
       .then((response) => {
         this.zonas = response.data.Zonas;
-        this.total = response.data.Total;
         this.pageActual = response.data.Pagina;
-        this.totalMostrado = this.mostrado;
       })
       .catch((e) => {
         this.errors.push(e);
@@ -106,7 +104,7 @@ export default {
   methods: {
     anterior: function () {
       if (this.pageActual > 1) {
-        this.pageActual-=1
+        this.pageActual -= 1;
         var pag = String(this.pageActual);
         var url =
           "https://admin-grupo2.proyecto2021.linti.unlp.edu.ar/api/zonas-inundables/?page=" +
@@ -115,35 +113,59 @@ export default {
           .get(url)
           .then((response) => {
             this.zonas = response.data.Zonas;
-            this.total = response.data.Total;
-            console.log(this.totalMostrado);
           })
           .catch((e) => {
-            this.pageActual=1;
-            this.totalMostrado=0;
+            this.pageActual = 1;
+            this.errors.push(e);
+          });
+      }
+      if (this.pageActualPuntos > 1) {
+        this.pageActualPuntos -= 1;
+        var pagp = String(this.pageActualPuntos);
+        var urlp =
+          "https://admin-grupo2.proyecto2021.linti.unlp.edu.ar/api/puntos-encuentro/?page=" +
+          pagp;
+        axios
+          .get(urlp)
+          .then((response) => {
+            this.puntos = response.data.Puntos_encuentro;
+          })
+          .catch((e) => {
+            this.pageActualPuntos = 1;
             this.errors.push(e);
           });
       }
     },
     siguiente: function () {
-        this.pageActual+=1
-        var pag = String(this.pageActual);
-        var url =
-          "https://admin-grupo2.proyecto2021.linti.unlp.edu.ar/api/zonas-inundables/?page=" +
-          pag;
-          console.log(url);
-        axios
-          .get(url)
-          .then((response) => {
-            this.zonas = response.data.Zonas;
-            this.total = response.data.Total;
-            console.log(this.totalMostrado);
-          })
-          .catch((e) => {
-            this.pageActual-=1;
-            this.errors.push(e);
-          });
-      
+      this.pageActual += 1;
+      var pag = String(this.pageActual);
+      var url =
+        "https://admin-grupo2.proyecto2021.linti.unlp.edu.ar/api/zonas-inundables/?page=" +
+        pag;
+      axios
+        .get(url)
+        .then((response) => {
+          this.zonas = response.data.Zonas;
+        })
+        .catch((e) => {
+          this.pageActual -= 1;
+          this.errors.push(e);
+        });
+
+      this.pageActualPuntos += 1;
+      var pagp = String(this.pageActualPuntos);
+      var urlp =
+        "https://admin-grupo2.proyecto2021.linti.unlp.edu.ar/api/puntos-encuentro/?page=" +
+        pagp;
+      axios
+        .get(urlp)
+        .then((response) => {
+          this.puntos = response.data.Puntos_encuentro;
+        })
+        .catch((e) => {
+          this.pageActualPuntos -= 1;
+          this.errors.push(e);
+        });
     },
   },
 };
