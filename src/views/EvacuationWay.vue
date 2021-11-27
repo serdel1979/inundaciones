@@ -14,6 +14,7 @@
   </n-layout>
 
   <div>
+    <h2>Zonas inundables</h2>
     <table>
       <thead>
         <tr>
@@ -29,6 +30,21 @@
           <td>
             <a v-bind:href="url">Ver</a>
           </td>
+        </tr>
+      </tbody>
+    </table>
+    <h2>Puntos de encuentro</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Nombre</th>
+          <th>Descripcion</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="(punto, index) in puntos" :key="`puntos-${index}`">
+          <td>{{ punto.name }}</td>
+          <td>{{ punto.descripcion }}</td>
         </tr>
       </tbody>
     </table>

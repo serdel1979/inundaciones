@@ -20,6 +20,7 @@
     </l-map>
   </n-layout>
   <div>
+    <h2>Caminos de evacuación</h2>
     <table>
       <thead>
         <tr>
@@ -33,6 +34,21 @@
           <td>
             <router-link to="/detalle-zona/{{zona.id}}">ver</router-link>
           </td>
+        </tr>
+      </tbody>
+    </table>
+    <h2>Puntos de encuentro</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Nombre</th>
+          <th>Descripcion</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="(punto, index) in puntos" :key="`puntos-${index}`">
+          <td>{{ punto.name }}</td>
+          <td>{{ punto.descripcion }}</td>
         </tr>
       </tbody>
     </table>
