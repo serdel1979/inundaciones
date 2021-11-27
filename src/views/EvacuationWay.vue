@@ -3,7 +3,7 @@
     <l-map style="height: 700px; width: 95%" :zoom="zoom" :center="center">
       <l-tile-layer :url="url" :attribution="attribution"></l-tile-layer>
       <div v-for="(camino, index) in caminos" :key="`caminos-${index}`">
-        <l-polyline :lat-lngs="camino.Coordenadas" :color="camino.colour" />
+        <l-polyline :lat-lngs="camino.Coordenadas" :color='red' />
       </div>
       <div v-for="(punto, index) in puntos" :key="`puntos-${index}`">
         <l-marker :lat-lng="punto.latlong">

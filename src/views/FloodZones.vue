@@ -6,7 +6,9 @@
         <l-polygon
           :lat-lngs="[zona.Coordenadas]"
           :color="zona.colour"
+          :fill="true"
           :fillColor="zona.colour"
+          :fillOpacity="0.5"
         />
       </div>
       <div v-for="(punto, index) in puntos" :key="`puntos-${index}`">
@@ -29,11 +31,15 @@
         <tr v-for="(zona, index) in zonas" :key="`zonas-${index}`">
           <td>{{ zona.name }}</td>
           <td>
-            <a v-bind:href=(url)>Ver</a>
+            <a v-bind:href="url">Ver</a>
           </td>
         </tr>
       </tbody>
     </table>
+    <div id="pages">
+      <button v-on:click="anterior('anterior')">&#171;</button>
+      <button v-on:click="siguiente('siguiente')">&#187;</button>
+    </div>
   </div>
 </template>
 
@@ -68,7 +74,8 @@ export default {
       puntos: [],
       zonas: [],
       total: 0,
-      errors: [],
+      pageActual: 0,
+      errors: []
     };
   },
   created() {
@@ -79,6 +86,8 @@ export default {
       .then((response) => {
         this.zonas = response.data.Zonas;
         this.total = response.data.Total;
+        this.pageActual = response.data.Pagina;
+        this.totalMostrado = this.mostrado;
       })
       .catch((e) => {
         this.errors.push(e);
@@ -93,6 +102,49 @@ export default {
       .catch((e) => {
         this.errors.push(e);
       });
+  },
+  methods: {
+    anterior: function () {
+      if (this.pageActual > 1) {
+        this.pageActual-=1
+        var pag = String(this.pageActual);
+        var url =
+          "https://admin-grupo2.proyecto2021.linti.unlp.edu.ar/api/zonas-inundables/?page=" +
+          pag;
+        axios
+          .get(url)
+          .then((response) => {
+            this.zonas = response.data.Zonas;
+            this.total = response.data.Total;
+            console.log(this.totalMostrado);
+          })
+          .catch((e) => {
+            this.pageActual=1;
+            this.totalMostrado=0;
+            this.errors.push(e);
+          });
+      }
+    },
+    siguiente: function () {
+        this.pageActual+=1
+        var pag = String(this.pageActual);
+        var url =
+          "https://admin-grupo2.proyecto2021.linti.unlp.edu.ar/api/zonas-inundables/?page=" +
+          pag;
+          console.log(url);
+        axios
+          .get(url)
+          .then((response) => {
+            this.zonas = response.data.Zonas;
+            this.total = response.data.Total;
+            console.log(this.totalMostrado);
+          })
+          .catch((e) => {
+            this.pageActual-=1;
+            this.errors.push(e);
+          });
+      
+    },
   },
 };
 </script>
