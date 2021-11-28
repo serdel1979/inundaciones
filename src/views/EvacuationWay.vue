@@ -82,7 +82,6 @@ export default {
         '&copy; <a target="_blank" href="http://osm.org/copyright">OpenStreetMap</a> contributors',
       zoom: 14,
       center: [-34.9187, -57.956],
-      markerLatLng: [-34.9187, -57.956],
       caminos: [],
       name: "",
       descripcion: "",
@@ -94,19 +93,23 @@ export default {
     };
   },
   mounted() {
-    if(!("geolocation" in navigator)) {
-      this.errorStr = 'Geolocación no esta disponible.';
+    if (!("geolocation" in navigator)) {
+      this.errorStr = "Geolocación no esta disponible.";
       return;
     }
     this.gettingLocation = true;
     // get position
-    navigator.geolocation.getCurrentPosition(pos => {
-      this.gettingLocation = false;
-      this.center = pos;
-    }, err => {
-      this.gettingLocation = false;
-      this.errorStr = err.message;
-    })
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        this.gettingLocation = false;
+        this.center = [pos.coords.latitude,pos.coords.longitude];
+        console.log(this.center);
+      },
+      (err) => {
+        this.gettingLocation = false;
+        this.errorStr = err.message;
+      }
+    );
   },
   created() {
     axios

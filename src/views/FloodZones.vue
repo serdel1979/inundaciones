@@ -16,7 +16,7 @@
           <l-popup ref="popup">{{ punto.name }}</l-popup>
         </l-marker>
       </div>
-      <l-marker :lat-lng="markerLatLng"> </l-marker>
+     
     </l-map>
   </n-layout>
   <div>
@@ -25,7 +25,6 @@
       <thead>
         <tr>
           <th>Nombre</th>
-          
         </tr>
       </thead>
       <tbody>
@@ -37,6 +36,10 @@
         </tr>
       </tbody>
     </table>
+    <div id="pages">
+      <button v-on:click="anterior()">&#171;</button>
+      <button v-on:click="siguiente()">&#187;</button>
+    </div>
     <h2>Puntos de encuentro</h2>
     <table>
       <thead>
@@ -53,8 +56,8 @@
       </tbody>
     </table>
     <div id="pages">
-      <button v-on:click="anterior('anterior')">&#171;</button>
-      <button v-on:click="siguiente('siguiente')">&#187;</button>
+      <button v-on:click="panterior()">&#171;</button>
+      <button v-on:click="psiguiente()">&#187;</button>
     </div>
   </div>
 </template>
@@ -86,34 +89,37 @@ export default {
         '&copy; <a target="_blank" href="http://osm.org/copyright">OpenStreetMap</a> contributors',
       zoom: 14,
       center: [-34.9187, -57.956],
-      markerLatLng: [-34.9187, -57.956],
       puntos: [],
       zonas: [],
       pageActual: 0,
       pageActualPuntos: 0,
+      puntosSiguiente: true,
+      zonasSiguientes: true,
       errors: [],
     };
   },
   mounted() {
-    if(!("geolocation" in navigator)) {
-      this.errorStr = 'Geolocación no esta disponible.';
+    if (!("geolocation" in navigator)) {
+      this.errorStr = "Geolocación no esta disponible.";
       return;
     }
     this.gettingLocation = true;
     // get position
-    navigator.geolocation.getCurrentPosition(pos => {
-      this.gettingLocation = false;
-      this.center = pos;
-    }, err => {
-      this.gettingLocation = false;
-      this.errorStr = err.message;
-    })
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        this.gettingLocation = false;
+        this.center = [pos.coords.latitude,pos.coords.longitude];
+        console.log(this.center);
+      },
+      (err) => {
+        this.gettingLocation = false;
+        this.errorStr = err.message;
+      }
+    );
   },
   created() {
     axios
-      .get(
-        "https://admin-grupo2.proyecto2021.linti.unlp.edu.ar/api/zonas-inundables"
-      )
+      .get("http://localhost:5000/api/zonas-inundables")
       .then((response) => {
         this.zonas = response.data.Zonas;
         this.pageActual = response.data.Pagina;
@@ -122,9 +128,7 @@ export default {
         this.errors.push(e);
       });
     axios
-      .get(
-        "https://admin-grupo2.proyecto2021.linti.unlp.edu.ar/api/puntos-encuentro/"
-      )
+      .get("http://localhost:5000/api/puntos-encuentro/")
       .then((response) => {
         this.puntos = response.data.Puntos_encuentro;
       })
@@ -135,11 +139,10 @@ export default {
   methods: {
     anterior: function () {
       if (this.pageActual > 1) {
+        this.zonasSiguientes = true;
         this.pageActual -= 1;
         var pag = String(this.pageActual);
-        var url =
-          "https://admin-grupo2.proyecto2021.linti.unlp.edu.ar/api/zonas-inundables/?page=" +
-          pag;
+        var url = "http://localhost:5000/api/zonas-inundables/?page=" + pag;
         axios
           .get(url)
           .then((response) => {
@@ -150,12 +153,30 @@ export default {
             this.errors.push(e);
           });
       }
+    },
+    siguiente: function () {
+      if (this.zonasSiguientes) {
+        this.pageActual += 1;
+        var pag = String(this.pageActual);
+        var url = "http://localhost:5000/api/zonas-inundables/?page=" + pag;
+        axios
+          .get(url)
+          .then((response) => {
+            this.zonas = response.data.Zonas;
+          })
+          .catch((e) => {
+            this.pageActual -= 1;
+            this.zonasSiguientes = false;
+            this.errors.push(e);
+          });
+      }
+    },
+    panterior: function () {
       if (this.pageActualPuntos > 1) {
+        this.puntosSiguiente = true;
         this.pageActualPuntos -= 1;
         var pagp = String(this.pageActualPuntos);
-        var urlp =
-          "https://admin-grupo2.proyecto2021.linti.unlp.edu.ar/api/puntos-encuentro/?page=" +
-          pagp;
+        var urlp = "http://localhost:5000/api/puntos-encuentro/?page=" + pagp;
         axios
           .get(urlp)
           .then((response) => {
@@ -167,36 +188,22 @@ export default {
           });
       }
     },
-    siguiente: function () {
-      this.pageActual += 1;
-      var pag = String(this.pageActual);
-      var url =
-        "https://admin-grupo2.proyecto2021.linti.unlp.edu.ar/api/zonas-inundables/?page=" +
-        pag;
-      axios
-        .get(url)
-        .then((response) => {
-          this.zonas = response.data.Zonas;
-        })
-        .catch((e) => {
-          this.pageActual -= 1;
-          this.errors.push(e);
-        });
-
-      this.pageActualPuntos += 1;
-      var pagp = String(this.pageActualPuntos);
-      var urlp =
-        "https://admin-grupo2.proyecto2021.linti.unlp.edu.ar/api/puntos-encuentro/?page=" +
-        pagp;
-      axios
-        .get(urlp)
-        .then((response) => {
-          this.puntos = response.data.Puntos_encuentro;
-        })
-        .catch((e) => {
-          this.pageActualPuntos -= 1;
-          this.errors.push(e);
-        });
+    psiguiente: function () {
+      if (this.puntosSiguiente) {
+        this.pageActualPuntos += 1;
+        var pagp = String(this.pageActualPuntos);
+        var urlp = "http://localhost:5000/api/puntos-encuentro/?page=" + pagp;
+        axios
+          .get(urlp)
+          .then((response) => {
+            this.puntos = response.data.Puntos_encuentro;
+          })
+          .catch((e) => {
+            this.puntosSiguiente = false;
+            this.pageActualPuntos -= 1;
+            this.errors.push(e);
+          });
+      }
     },
   },
 };
